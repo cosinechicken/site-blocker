@@ -6,7 +6,11 @@ self.breakTimer = (() => {
     // Define variables and functions
     let breakStartTime = null;
     const breakDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
-    const breakInterval = 90 * 60 * 1000; // 60 minutes in milliseconds
+    const breakInterval = 90 * 60 * 1000; // 90 minutes in milliseconds
+
+    chrome.storage.local.get('breakStartTime', (data) => {
+        breakStartTime = data.breakStartTime || null;
+    });
 
     // Function to check if the user is currently on a break
     function isOnBreak() {
@@ -40,15 +44,16 @@ self.breakTimer = (() => {
             return { success: false, remainingTime: getRemainingBreakInterval() };
         }
         breakStartTime = currentTime;
+        // Store the break start time using chrome.storage.local
+        chrome.storage.local.set({ breakStartTime });
         return { success: true, remainingTime: breakDuration };
     }
 
     // Function to stop an ongoing break
     function stopBreak() {
-        if (!isOnBreak()) {
-        return { success: false };
-        }
-        breakStartTime = new Date(Date.now() - breakInterval + breakDuration);
+        breakStartTime = Date.now() - breakDuration;
+        // Store the break start time using chrome.storage.local
+        chrome.storage.local.set({ breakStartTime });
         return { success: true };
     }
 
