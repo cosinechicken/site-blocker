@@ -1,3 +1,31 @@
+// Helper function to extract hostname from URL
+function extractHostname(url) {
+  try {
+    // Prepend "https://" to the URL if no protocol is provided
+    if (!url.match(/^(https?:\/\/)/i)) {
+      url = 'https://' + url;
+    }
+    const parsedUrl = new URL(url);
+    return parsedUrl.hostname;
+  } catch {
+    return null;
+  }
+}
+// Helper function to validate URL using the URL constructor
+function isValidUrl(url) {
+  try {
+    // Check if the URL starts with "http://" or "https://"
+    if (!url.match(/^(https?:\/\/)/i)) {
+      // Automatically prepend "https://" to the URL if no protocol is provided
+      url = 'https://' + url;
+    }
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // Retrieve the offTaskWebsites array from the Chrome storage.
 chrome.storage.local.get('offTaskWebsites', (data) => {
   const offTaskWebsites = data.offTaskWebsites || [];
@@ -54,13 +82,37 @@ chrome.storage.local.get('offTaskWebsites', (data) => {
 
   // Add website to the block list
   addWebsiteButton.addEventListener('click', () => {
-    const newWebsite = websiteInput.value.trim();
-    if (!newWebsite) return; // Ignore empty input
+    let newWebsite = websiteInput.value.trim();
+    if (!newWebsite) {
+      alert('Please enter a website URL.');
+      return; // Ignore empty input
+    }
+
+    // Validate the entered URL
+    if (!isValidUrl(newWebsite)) {
+      alert('Please enter a valid website URL.');
+      return; // Ignore invalid URL format
+    }
+
+    // Prepend "https://" to the URL if no protocol is provided (for storage)
+    if (!newWebsite.match(/^(https?:\/\/)/i)) {
+      newWebsite = 'https://' + newWebsite;
+    }
+
+    // Extract the hostname of the new website
+    const newWebsiteHostname = extractHostname(newWebsite);
 
     // Retrieve the existing offTaskWebsites array from the Chrome storage
     chrome.storage.local.get('offTaskWebsites', (data) => {
       const offTaskWebsites = data.offTaskWebsites || [];
-      offTaskWebsites.push(newWebsite); // Add the new website to the array
+
+      // Check for duplicates based on the hostname
+      const existingHostnames = offTaskWebsites.map(extractHostname);
+      if (existingHostnames.includes(newWebsiteHostname)) {
+        alert('This website is already in the block list.');
+        return; // Ignore duplicate website
+      }
+      offTaskWebsites.push(newWebsiteHostname); // Add the new website to the array
 
       // Store the updated offTaskWebsites array in the Chrome storage
       chrome.storage.local.set({ offTaskWebsites: offTaskWebsites }, () => {
