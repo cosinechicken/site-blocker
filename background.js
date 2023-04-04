@@ -4,8 +4,19 @@ importScripts('breakTimer.js');
 // Define a list of off-task websites (domains).
 let offTaskWebsites = ['facebook.com', 'twitter.com', 'youtube.com', 'reddit.com'];
 
-chrome.storage.local.set({ offTaskWebsites: offTaskWebsites }, () => {
-  console.log('Off-task websites list stored in Chrome storage.');
+// Retrieve the offTaskWebsites array from the Chrome storage
+chrome.storage.local.get('offTaskWebsites', (data) => {
+  offTaskWebsites = data.offTaskWebsites || offTaskWebsites;
+  chrome.storage.local.set({ offTaskWebsites: offTaskWebsites }, () => {
+    console.log('Off-task websites list stored in Chrome storage.');
+  });
+});
+
+// Listen for changes in Chrome storage
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  if (namespace === 'local' && changes.offTaskWebsites) {
+    offTaskWebsites = changes.offTaskWebsites.newValue || [];
+  }
 });
 
 const {
@@ -28,13 +39,21 @@ chrome.storage.local.get('offTaskWebsites', (data) => {
 
   // Listen for web navigation events to detect when a user visits a website.
   chrome.webNavigation.onCommitted.addListener(details => {
+    // Ignore navigation events that are not of type "main_frame"
+    if (details.frameId !== 0) {
+      return;
+    }
+
     // Extract the hostname from the URL.
     const url = new URL(details.url);
     const hostname = url.hostname;
-
+    
     // Check if the visited website is in the list of off-task websites.
     // Do not block access if the user is currently on a break.
-    if (!isOnBreak() && offTaskWebsites.some(website => hostname.includes(website))) {
+    if (!isOnBreak() && offTaskWebsites.some(website => {
+      const match = hostname === website || hostname.endsWith('.' + website);
+      return match;
+    })) {
       // If the tab is already blocked, do not block it again.
       if (blockedTabs.has(details.tabId)) return;
 

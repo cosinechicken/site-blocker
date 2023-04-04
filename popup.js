@@ -11,6 +11,7 @@ function extractHostname(url) {
     return null;
   }
 }
+
 // Helper function to validate URL using the URL constructor
 function isValidUrl(url) {
   try {
