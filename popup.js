@@ -49,6 +49,44 @@ chrome.storage.local.get('offTaskWebsites', (data) => {
     });
   });
 
+  const websiteInput = document.getElementById('websiteInput');
+  const addWebsiteButton = document.getElementById('addWebsiteButton');
+
+  // Add website to the block list
+  addWebsiteButton.addEventListener('click', () => {
+    const newWebsite = websiteInput.value.trim();
+    if (!newWebsite) return; // Ignore empty input
+
+    // Retrieve the existing offTaskWebsites array from the Chrome storage
+    chrome.storage.local.get('offTaskWebsites', (data) => {
+      const offTaskWebsites = data.offTaskWebsites || [];
+      offTaskWebsites.push(newWebsite); // Add the new website to the array
+
+      // Store the updated offTaskWebsites array in the Chrome storage
+      chrome.storage.local.set({ offTaskWebsites: offTaskWebsites }, () => {
+        websiteInput.value = ''; // Clear the input field
+        populateOffTaskWebsites(); // Refresh the displayed list
+      });
+    });
+  });
+
+  // Function to populate off-task websites list
+  function populateOffTaskWebsites() {
+    chrome.storage.local.get('offTaskWebsites', (data) => {
+      const offTaskWebsites = data.offTaskWebsites || [];
+      const offTaskWebsitesList = document.getElementById('offTaskWebsitesList');
+      offTaskWebsitesList.innerHTML = ''; // Clear the list
+      offTaskWebsites.forEach(website => {
+        const listItem = document.createElement('li');
+        listItem.textContent = website;
+        offTaskWebsitesList.appendChild(listItem);
+      });
+    });
+  }
+
+  // Populate the list on popup load
+  populateOffTaskWebsites();
+
   // Update remaining times on popup load
   updateRemainingTimes();
 

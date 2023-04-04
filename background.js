@@ -2,53 +2,58 @@
 importScripts('breakTimer.js');
 
 // Define a list of off-task websites (domains).
-const offTaskWebsites = ['facebook.com', 'twitter.com', 'youtube.com', 'reddit.com'];
+let offTaskWebsites = ['facebook.com', 'twitter.com', 'youtube.com', 'reddit.com'];
 
-// Store the offTaskWebsites array in the Chrome storage.
 chrome.storage.local.set({ offTaskWebsites: offTaskWebsites }, () => {
   console.log('Off-task websites list stored in Chrome storage.');
 });
 
-const blockedTabs = new Map();  // Keep track of blocked tabs and their timers
 const {
+  blockedTabs,
   isOnBreak,
   getRemainingBreakTime,
   getRemainingBreakInterval,
   startBreak
 } = self.breakTimer;
 
-// Define break timer variables
-let breakStartTime = null;
-const breakDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
-const breakInterval = 60 * 60 * 1000; // 60 minutes in milliseconds
+// Retrieve the offTaskWebsites array from the Chrome storage
+chrome.storage.local.get('offTaskWebsites', (data) => {
+  offTaskWebsites = data.offTaskWebsites || [];
 
-// Listen for web navigation events to detect when a user visits a website.
-chrome.webNavigation.onCommitted.addListener(details => {
-  // Extract the hostname from the URL.
-  const url = new URL(details.url);
-  const hostname = url.hostname;
+  // Store the offTaskWebsites array in the Chrome storage.
+  chrome.storage.local.set({ offTaskWebsites: offTaskWebsites }, () => {
+    console.log('Off-task websites list stored in Chrome storage.');
+  });
 
-  // Check if the visited website is in the list of off-task websites.
-  // Do not block access if the user is currently on a break.
-  if (!isOnBreak() && offTaskWebsites.some(website => hostname.includes(website))) {
-    // If the tab is already blocked, do not block it again.
-    if (blockedTabs.has(details.tabId)) return;
+  // Listen for web navigation events to detect when a user visits a website.
+  chrome.webNavigation.onCommitted.addListener(details => {
+    // Extract the hostname from the URL.
+    const url = new URL(details.url);
+    const hostname = url.hostname;
 
-    // Redirect to the "blocked.html" page.
-    const blockedPageUrl = chrome.runtime.getURL('blocked.html');
-    chrome.tabs.update(details.tabId, { url: blockedPageUrl });
+    // Check if the visited website is in the list of off-task websites.
+    // Do not block access if the user is currently on a break.
+    if (!isOnBreak() && offTaskWebsites.some(website => hostname.includes(website))) {
+      // If the tab is already blocked, do not block it again.
+      if (blockedTabs.has(details.tabId)) return;
 
-    // Unblock access after a minute (60000 milliseconds).
-    const timer = setTimeout(() => {
-      chrome.tabs.update(details.tabId, { url: details.url });
-      // Remove the tab from the set of blocked tabs
-      blockedTabs.delete(details.tabId);
-    }, 60000);
+      // Redirect to the "blocked.html" page.
+      const blockedPageUrl = chrome.runtime.getURL('blocked.html');
+      chrome.tabs.update(details.tabId, { url: blockedPageUrl });
 
-    // Add the tab to the map of blocked tabs with its timer
-    blockedTabs.set(details.tabId, timer);
-  }
+      // Unblock access after a minute (60000 milliseconds).
+      const timer = setTimeout(() => {
+        chrome.tabs.update(details.tabId, { url: details.url });
+        // Remove the tab from the set of blocked tabs
+        blockedTabs.delete(details.tabId);
+      }, 60000);
+
+      // Add the tab to the map of blocked tabs with its timer
+      blockedTabs.set(details.tabId, timer);
+    }
+  });
 });
+
 
 // Listen for tab removals to clean up blocked tabs map and clear timers
 chrome.tabs.onRemoved.addListener(tabId => {

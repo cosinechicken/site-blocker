@@ -1,5 +1,8 @@
 // Define break timer variables and functions in the global scope
 self.breakTimer = (() => {
+    // Define a variable to keep track of blocked tabs and their timers
+    const blockedTabs = new Map();
+
     // Define variables and functions
     let breakStartTime = null;
     const breakDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
@@ -41,6 +44,7 @@ self.breakTimer = (() => {
     }
 
     return {
+        blockedTabs,
         isOnBreak,
         getRemainingBreakTime,
         getRemainingBreakInterval,
