@@ -77,11 +77,13 @@ chrome.storage.local.get('offTaskWebsites', (data) => {
     });
   });
 
-  const websiteInput = document.getElementById('websiteInput');
   const addWebsiteButton = document.getElementById('addWebsiteButton');
 
-  // Add website to the block list
-  addWebsiteButton.addEventListener('click', () => {
+  // Retrieve the input field element
+  const websiteInput = document.getElementById('websiteInput');
+
+  // Function to add a new website to the block list
+  function addWebsite() {
     let newWebsite = websiteInput.value.trim();
     if (!newWebsite) {
       alert('Please enter a website URL.');
@@ -94,11 +96,6 @@ chrome.storage.local.get('offTaskWebsites', (data) => {
       return; // Ignore invalid URL format
     }
 
-    // Prepend "https://" to the URL if no protocol is provided (for storage)
-    if (!newWebsite.match(/^(https?:\/\/)/i)) {
-      newWebsite = 'https://' + newWebsite;
-    }
-
     // Extract the hostname of the new website
     const newWebsiteHostname = extractHostname(newWebsite);
 
@@ -107,11 +104,11 @@ chrome.storage.local.get('offTaskWebsites', (data) => {
       const offTaskWebsites = data.offTaskWebsites || [];
 
       // Check for duplicates based on the hostname
-      const existingHostnames = offTaskWebsites.map(extractHostname);
-      if (existingHostnames.includes(newWebsiteHostname)) {
+      if (offTaskWebsites.includes(newWebsiteHostname)) {
         alert('This website is already in the block list.');
         return; // Ignore duplicate website
       }
+
       offTaskWebsites.push(newWebsiteHostname); // Add the new website to the array
 
       // Store the updated offTaskWebsites array in the Chrome storage
@@ -120,8 +117,18 @@ chrome.storage.local.get('offTaskWebsites', (data) => {
         populateOffTaskWebsites(); // Refresh the displayed list
       });
     });
-  });
+  }
 
+  // Add website to the block list when the button is clicked
+  addWebsiteButton.addEventListener('click', addWebsite);
+
+  // Add website to the block list when the Enter key is pressed in the input field
+  websiteInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      addWebsite();
+    }
+  });
+  
   // Function to populate off-task websites list
   function populateOffTaskWebsites() {
     chrome.storage.local.get('offTaskWebsites', (data) => {
