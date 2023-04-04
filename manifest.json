@@ -1,0 +1,15 @@
+{
+    "manifest_version": 3,
+    "name": "Off-Task Blocker",
+    "version": "1.0",
+    "description": "An extension to detect and block off-task browsing behavior.",
+    "permissions": ["tabs", "webNavigation"],
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "host_permissions": ["*://*/*"]
+  }
+  
