@@ -6,7 +6,7 @@ self.breakTimer = (() => {
     // Define variables and functions
     let breakStartTime = null;
     const breakDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
-    const breakInterval = 60 * 60 * 1000; // 60 minutes in milliseconds
+    const breakInterval = 90 * 60 * 1000; // 60 minutes in milliseconds
 
     // Function to check if the user is currently on a break
     function isOnBreak() {
@@ -43,11 +43,21 @@ self.breakTimer = (() => {
         return { success: true, remainingTime: breakDuration };
     }
 
+    // Function to stop an ongoing break
+    function stopBreak() {
+        if (!isOnBreak()) {
+        return { success: false };
+        }
+        breakStartTime = new Date(Date.now() - breakInterval + breakDuration);
+        return { success: true };
+    }
+
     return {
         blockedTabs,
         isOnBreak,
         getRemainingBreakTime,
         getRemainingBreakInterval,
-        startBreak
+        startBreak,
+        stopBreak
     };
 })();

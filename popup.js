@@ -43,6 +43,7 @@ chrome.storage.local.get('offTaskWebsites', (data) => {
   });
 
   const startBreakButton = document.getElementById('startBreakButton');
+  const stopBreakButton = document.getElementById('stopBreakButton');
   const remainingBreakTimeElement = document.getElementById('remainingBreakTime');
   const remainingBreakIntervalElement = document.getElementById('remainingBreakInterval');
 
@@ -73,6 +74,18 @@ chrome.storage.local.get('offTaskWebsites', (data) => {
       } else {
         const remainingInterval = formatTime(response.remainingTime);
         alert(`You cannot take another break for the next ${remainingInterval}.`);
+      }
+    });
+  });
+
+  // Stop an ongoing break when the button is clicked
+  stopBreakButton.addEventListener('click', () => {
+    chrome.runtime.sendMessage({ action: 'stopBreak' }, (response) => {
+      if (response.success) {
+        alert('Break stopped.');
+        updateRemainingTimes();
+      } else {
+        alert('No ongoing break to stop.');
       }
     });
   });

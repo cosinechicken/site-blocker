@@ -13,7 +13,8 @@ const {
   isOnBreak,
   getRemainingBreakTime,
   getRemainingBreakInterval,
-  startBreak
+  startBreak,
+  stopBreak
 } = self.breakTimer;
 
 // Retrieve the offTaskWebsites array from the Chrome storage
@@ -75,5 +76,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       remainingBreakTime: getRemainingBreakTime(),
       remainingBreakInterval: getRemainingBreakInterval()
     });
+  }
+  // Handle stopBreak action
+  if (message.action === 'stopBreak') {
+    const result = stopBreak();
+    sendResponse(result);
   }
 });
