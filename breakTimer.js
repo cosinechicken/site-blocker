@@ -5,8 +5,8 @@ self.breakTimer = (() => {
 
     // Define variables and functions
     let breakStartTime = null;
-    const breakDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
-    const breakInterval = 90 * 60 * 1000; // 90 minutes in milliseconds
+    const breakDuration = 10 * 60 * 1000; // 10 minutes in milliseconds
+    const breakInterval = 120 * 60 * 1000; // 120 minutes in milliseconds
 
     chrome.storage.local.get('breakStartTime', (data) => {
         breakStartTime = data.breakStartTime || null;
