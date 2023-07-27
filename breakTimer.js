@@ -39,8 +39,14 @@ self.breakTimer = (() => {
     // Allow the user to start a break (e.g., via the extension popup)
     function startBreak() {
         const currentTime = Date.now();
+        const date = new Date(currentTime);
+        const currentHour = date.getHours();
+
         if (breakStartTime && currentTime - breakStartTime < breakInterval) {
             // The user cannot take another break for another hour
+            return { success: false, remainingTime: getRemainingBreakInterval() };
+        } else if (currentHour >= 0) {
+            console.log("No browsing allowed.");
             return { success: false, remainingTime: getRemainingBreakInterval() };
         }
         breakStartTime = currentTime;
