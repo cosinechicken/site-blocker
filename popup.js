@@ -1,3 +1,5 @@
+const displayLimit = 10;
+
 // Helper function to extract hostname from URL
 function extractHostname(url) {
   try {
@@ -144,16 +146,31 @@ chrome.storage.local.get('offTaskWebsites', (data) => {
   });
   
   // Function to populate off-task websites list
+  // Function to populate off-task websites list with a maximum display limit
   function populateOffTaskWebsites() {
     chrome.storage.local.get('offTaskWebsites', (data) => {
       const offTaskWebsites = data.offTaskWebsites || [];
       const offTaskWebsitesList = document.getElementById('offTaskWebsitesList');
       offTaskWebsitesList.innerHTML = ''; // Clear the list
-      offTaskWebsites.forEach(website => {
+
+      // Limit the number of displayed websites
+      offTaskWebsites.slice(0, displayLimit).forEach(website => {
         const listItem = document.createElement('li');
         listItem.textContent = website;
         offTaskWebsitesList.appendChild(listItem);
       });
+
+      // Add a link to view all sites if the list exceeds the display limit
+      if (offTaskWebsites.length > displayLimit) {
+        const viewAllButton = document.createElement('button');
+        viewAllButton.textContent = 'View All Blocked Sites';
+        viewAllButton.className = 'view-all-button'; // Unique class for styling
+        viewAllButton.addEventListener('click', function() {
+            window.open(chrome.runtime.getURL('allBlockedSites.html'), '_blank');
+        });
+
+        offTaskWebsitesList.appendChild(viewAllButton);
+      }
     });
   }
 

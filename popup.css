@@ -44,4 +44,10 @@ body {
   p {
     margin: 5px 0;
   }
-  
+  .view-all-button {
+    background-color: #007BFF; /* Blue background */
+}
+
+.view-all-button:hover {
+    background-color: #0069D9; /* Darker blue on hover */
+}

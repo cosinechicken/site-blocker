@@ -1,0 +1,48 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.content-wrapper {
+    flex: 1; /* Makes the content fill the space between header and footer */
+    overflow-y: auto; /* Enables scrolling for the main content */
+}
+
+header {
+    background: #666;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+main {
+    padding: 20px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    background: #fff;
+    margin-bottom: 8px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+footer {
+    text-align: center;
+    padding: 4px 0;
+    background: #666;
+    color: #fff;
+}

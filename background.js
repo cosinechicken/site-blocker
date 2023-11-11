@@ -2,7 +2,7 @@
 importScripts('breakTimer.js');
 
 // Define a list of off-task websites (domains).
-let offTaskWebsites = ['facebook.com', 'twitter.com', 'youtube.com', 'reddit.com'];
+let offTaskWebsites = ['example.com'];
 
 // Retrieve the offTaskWebsites array from the Chrome storage
 chrome.storage.local.get('offTaskWebsites', (data) => {
