@@ -24,7 +24,7 @@ header {
 }
 
 main {
-    padding: 20px;
+    padding: 24px;
 }
 
 ul {
@@ -38,6 +38,27 @@ ul li {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
+}
+
+.importexport {
+    display: flex;
+    justify-content:center;
+    align-items: center;
+}
+
+button {
+    margin: 0px 24px 0px 0px;
+    padding: 6px 12px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #0069D9;
 }
 
 footer {

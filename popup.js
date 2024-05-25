@@ -72,7 +72,7 @@ chrome.storage.local.get('offTaskWebsites', (data) => {
   startBreakButton.addEventListener('click', () => {
     chrome.runtime.sendMessage({ action: 'startBreak' }, response => {
       if (response.success) {
-        alert('Break started! Enjoy your break for the next 30 minutes.');
+        alert('Break started! Enjoy your break for the next 5 minutes.');
         updateRemainingTimes();
       } else {
         const remainingInterval = formatTime(response.remainingTime);
